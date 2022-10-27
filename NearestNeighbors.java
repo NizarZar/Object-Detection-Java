@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class NearestNeighbors {
@@ -8,7 +9,12 @@ public class NearestNeighbors {
     }
 
     public List<Point3D> rangeQuery(double eps, Point3D p){
-
-        return point3DList;
+        List<Point3D> sequence = new ArrayList<>();
+        for (Point3D point : this.point3DList){
+            if(point.distance(p) <= eps){
+                sequence.add(point);
+            }
+        }
+        return sequence;
     }
 }

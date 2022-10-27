@@ -17,7 +17,7 @@ public class Stack<Item> implements Iterable<Item> {
     public Stack() {
         first = null;
         n = 0;
-    }
+          }
 
     /**
      * Returns true if this stack is empty.
