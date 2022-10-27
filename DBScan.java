@@ -2,7 +2,6 @@ import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
-import java.util.Stack;
 
 
 public class DBScan {
@@ -10,10 +9,12 @@ public class DBScan {
     private double eps;
     private double minPts;
     private int c;
+    private int totalNoises;
     private HashMap<Integer, Double> hashMapR = new HashMap<>();
     private HashMap<Integer, Double> hashMapG = new HashMap<>();
     private HashMap<Integer, Double> hashMapB = new HashMap<>();
     private Random random = new Random();
+    private Stack<Point3D> stack = new Stack<>();
     private List<Point3D> points;
 
     public DBScan(List<Point3D> points){
@@ -33,13 +34,13 @@ public class DBScan {
 
 
     public void findClusters(){
-        NearestNeighbors N = new NearestNeighbors(points);
-        Stack<Point3D> stack = new Stack<>();
+        c = 0;
+        totalNoises = 0;
         hashMapR.put(-1, random.nextDouble());
         hashMapG.put(-1, random.nextDouble());
         hashMapB.put(-1, random.nextDouble());
-        c = 0;
         for(Point3D point : points){
+            NearestNeighbors N = new NearestNeighbors(points);
             final int UNDEFINED = 0;
             if(point.getLabel() != UNDEFINED){
                 continue;
@@ -48,9 +49,9 @@ public class DBScan {
             int NOISE = -1;
             if(nearest.size() < minPts){
                 point.setLabel(NOISE);
+                totalNoises++;
                 continue;
             }
-
             c++;
             hashMapR.put(c,random.nextDouble());
             hashMapG.put(c,random.nextDouble());
@@ -92,6 +93,7 @@ public class DBScan {
 
 
         }
+        scanner.close();
 
         return point3DList;
     }
@@ -104,18 +106,9 @@ public class DBScan {
         return new Point3D(x,y,z);
     }
 
-    private String[] createString(Point3D point){
-        String[] strings = new String[7];
-
-        strings[0] = String.valueOf(point.getX());
-        strings[1] = String.valueOf(point.getY());
-        strings[2] = String.valueOf(point.getZ());
-        strings[3] = String.valueOf(point.getLabel());
-        strings[4] = String.valueOf(hashMapR.get(point.getLabel()));
-        strings[5] = String.valueOf(hashMapG.get(point.getLabel()));
-        strings[6] = String.valueOf(hashMapB.get(point.getLabel()));
-
-        return strings;
+    private String createString(Point3D point){
+        return point.getX() + "," + point.getY() + "," + point.getZ() + "," + point.getLabel() + "," + hashMapR.get(point.getLabel()) + "," + hashMapG.get(point.getLabel()) +
+                "," + hashMapB.get(point.getLabel()) + " \n";
     }
 
     public void save(String filename) throws IOException {
@@ -124,11 +117,7 @@ public class DBScan {
             String firstLine = "x" + "," + "y" + "," + "z" + "," + "C" + "," + "R" + "," + "G"+","+"B" +"\n";
             fileWriter.write(firstLine);
             for(Point3D data : getPoints()){
-                String line = Arrays.toString(createString(data)) +
-                        "," +
-                        "\n";
-                line = line.substring(1);
-                line = line.replaceAll("]","");
+                String line = createString(data);
                 fileWriter.write(line);
             }
 
@@ -152,7 +141,6 @@ public class DBScan {
         long csvReader2 = System.currentTimeMillis();
         long csvReaderFull = csvReader2-csvReader;
         System.out.println("Reading CSV in " + csvReaderFull + "ms");
-
         dbScan.setEps(1.2);
         dbScan.setMinPts(10);
         long clusterFinder = System.currentTimeMillis();
@@ -166,7 +154,9 @@ public class DBScan {
         long fileSaver2 = System.currentTimeMillis();
         long fileSaverTotal = fileSaver2-fileSaver;
         System.out.println("Saving file in " + fileSaverTotal+"ms");
-        System.out.println("Number of clusters " + dbScan.getNumberOfClusters());
+        System.out.println("Total number of clusters found: " + dbScan.getNumberOfClusters());
+        System.out.println("Total number of noises found: " + dbScan.totalNoises);
+
 
     }
 }

@@ -7,6 +7,7 @@ public class Point3D {
     private double z;
     private int label;
     public Point3D(double x, double y, double z){
+        setLabel(0);
         this.x = x;
         this.y = y;
         this.z = z;
@@ -39,7 +40,7 @@ public class Point3D {
 
    @Override
    public String toString(){
-        return (this.x + " " + this.y + " " + this.z);
+        return (this.x + "" + this.y + "" + this.z + "");
    }
 
 }
