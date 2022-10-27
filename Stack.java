@@ -1,126 +1,97 @@
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.EmptyStackException;
+import java.util.Vector;
 
-public class Stack<Item> implements Iterable<Item> {
-    private Node<Item> first;     // top of stack
-    private int n;                // size of the stack
-
-    // helper linked list class
-    private static class Node<Item> {
-        private Item item;
-        private Node<Item> next;
-    }
-
+public class Stack<E> extends Vector<E> {
     /**
-     * Initializes an empty stack.
+     * Creates an empty Stack.
      */
     public Stack() {
-        first = null;
-        n = 0;
-          }
-
-    /**
-     * Returns true if this stack is empty.
-     *
-     * @return true if this stack is empty; false otherwise
-     */
-    public boolean isEmpty() {
-        return first == null;
     }
 
     /**
-     * Returns the number of items in this stack.
+     * Pushes an item onto the top of this stack. This has exactly
+     * the same effect as:
+     * <blockquote><pre>
+     * addElement(item)</pre></blockquote>
      *
-     * @return the number of items in this stack
+     * @param   item   the item to be pushed onto this stack.
+     * @return  the {@code item} argument.
+     * @see     java.util.Vector#addElement
      */
-    public int size() {
-        return n;
+    public E push(E item) {
+        addElement(item);
+
+        return item;
     }
 
     /**
-     * Adds the item to this stack.
+     * Removes the object at the top of this stack and returns that
+     * object as the value of this function.
      *
-     * @param item the item to add
+     * @return  The object at the top of this stack (the last item
+     *          of the {@code Vector} object).
+     * @throws EmptyStackException  if this stack is empty.
      */
-    public void push(Item item) {
-        Node<Item> prev = first;
-        first = new Node<Item>();
-        first.item = item;
-        first.next = prev;
-        n++;
+    public synchronized E pop() {
+        E       obj;
+        int     len = size();
+
+        obj = peek();
+        removeElementAt(len - 1);
+
+        return obj;
     }
 
     /**
-     * Removes and returns the item most recently added to this stack.
+     * Looks at the object at the top of this stack without removing it
+     * from the stack.
      *
-     * @return the item most recently added
-     * @throws NoSuchElementException if this stack is empty
+     * @return  the object at the top of this stack (the last item
+     *          of the {@code Vector} object).
+     * @throws  EmptyStackException  if this stack is empty.
      */
-    public Item pop() {
-        if (isEmpty()) throw new NoSuchElementException("Stack underflow");
-        Item item = first.item;        // save item to return
-        first = first.next;            // delete first node
-        n--;
-        return item;                   // return the saved item
-    }
+    public synchronized E peek() {
+        int     len = size();
 
-
-    /**
-     * Returns (but does not remove) the item most recently added to this stack.
-     *
-     * @return the item most recently added to this stack
-     * @throws NoSuchElementException if this stack is empty
-     */
-    public Item peek() {
-        if (isEmpty()) throw new NoSuchElementException("Stack underflow");
-        return first.item;
+        if (len == 0)
+            throw new EmptyStackException();
+        return elementAt(len - 1);
     }
 
     /**
-     * Returns a string representation of this stack.
+     * Tests if this stack is empty.
      *
-     * @return the sequence of items in this stack in LIFO order, separated by spaces
+     * @return  {@code true} if and only if this stack contains
+     *          no items; {@code false} otherwise.
      */
-    public String toString() {
-        StringBuilder s = new StringBuilder();
-        for (Item item : this) {
-            s.append(item);
-            s.append(' ');
+    public boolean empty() {
+        return size() == 0;
+    }
+
+    /**
+     * Returns the 1-based position where an object is on this stack.
+     * If the object {@code o} occurs as an item in this stack, this
+     * method returns the distance from the top of the stack of the
+     * occurrence nearest the top of the stack; the topmost item on the
+     * stack is considered to be at distance {@code 1}. The {@code equals}
+     * method is used to compare {@code o} to the
+     * items in this stack.
+     *
+     * @param   o   the desired object.
+     * @return  the 1-based position from the top of the stack where
+     *          the object is located; the return value {@code -1}
+     *          indicates that the object is not on the stack.
+     */
+    public synchronized int search(Object o) {
+        int i = lastIndexOf(o);
+
+        if (i >= 0) {
+            return size() - i;
         }
-        return s.toString();
+        return -1;
     }
 
-
-    /**
-     * Returns an iterator to this stack that iterates through the items in LIFO order.
-     *
-     * @return an iterator to this stack that iterates through the items in LIFO order
-     */
-    public Iterator<Item> iterator() {
-        return new LinkedIterator(first);
-    }
-
-    // an iterator, doesn't implement remove() since it's optional
-    private class LinkedIterator implements Iterator<Item> {
-        private Node<Item> current;
-
-        public LinkedIterator(Node<Item> first) {
-            current = first;
-        }
-
-        public boolean hasNext() {
-            return current != null;
-        }
-
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
-        public Item next() {
-            if (!hasNext()) throw new NoSuchElementException();
-            Item item = current.item;
-            current = current.next;
-            return item;
-        }
-    }
+    /** use serialVersionUID from JDK 1.0.2 for interoperability */
+    @java.io.Serial
+    private static final long serialVersionUID = 1224463164541339165L;
 }

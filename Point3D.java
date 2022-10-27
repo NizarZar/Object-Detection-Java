@@ -1,5 +1,3 @@
-
-
 public class Point3D {
 
     private double x;

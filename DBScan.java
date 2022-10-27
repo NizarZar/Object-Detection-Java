@@ -1,7 +1,8 @@
-import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
+
+import static java.util.stream.Collectors.toMap;
 
 
 public class DBScan {
@@ -13,8 +14,6 @@ public class DBScan {
     private HashMap<Integer, Double> hashMapR = new HashMap<>();
     private HashMap<Integer, Double> hashMapG = new HashMap<>();
     private HashMap<Integer, Double> hashMapB = new HashMap<>();
-    private Random random = new Random();
-    private Stack<Point3D> stack = new Stack<>();
     private List<Point3D> points;
 
     public DBScan(List<Point3D> points){
@@ -35,6 +34,8 @@ public class DBScan {
 
     public void findClusters(){
         c = 0;
+        Stack<Point3D> stack = new Stack<>();
+        Random random = new Random();
         totalNoises = 0;
         hashMapR.put(-1, random.nextDouble());
         hashMapG.put(-1, random.nextDouble());
@@ -46,7 +47,7 @@ public class DBScan {
                 continue;
             }
             List<Point3D> nearest = N.rangeQuery(eps,point);
-            int NOISE = -1;
+            final int NOISE = -1;
             if(nearest.size() < minPts){
                 point.setLabel(NOISE);
                 totalNoises++;
@@ -90,8 +91,6 @@ public class DBScan {
             String[] values = line.split(",");
             Point3D point3D = createPoint3D(values);
             point3DList.add(point3D);
-
-
         }
         scanner.close();
 
@@ -126,7 +125,6 @@ public class DBScan {
     }
 
     public int getNumberOfClusters(){
-
         return c;
     }
 
@@ -134,28 +132,42 @@ public class DBScan {
         return points;
     }
 
+    public void clustersSize(){
+        HashMap<Integer, Integer> hashMapClustersSize = new HashMap<>();
+        LinkedHashMap<Integer, Integer> linkedHashMap = new LinkedHashMap<>();
+       for(Point3D point : getPoints()){
+           hashMapClustersSize.merge(point.getLabel(),1,Integer::sum);
+       }
+        hashMapClustersSize.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).forEach(reverse -> linkedHashMap.put(reverse.getKey(),reverse.getValue()));
+        for(int cluster : linkedHashMap.keySet()){
+            System.out.println("Cluster: " + cluster + " has " + linkedHashMap.get(cluster) + " points");
+        }
+        System.out.println("Total number of clusters found: " + getNumberOfClusters());
+        System.out.println("Total number of noises found: " + totalNoises);
+
+    }
+
     public static void main(String[] args) throws IOException {
         long csvReader = System.currentTimeMillis();
-        List<Point3D> ps = read("Point_Cloud_1.csv");
+        List<Point3D> ps = read(args[0]);
         DBScan dbScan = new DBScan(ps);
         long csvReader2 = System.currentTimeMillis();
         long csvReaderFull = csvReader2-csvReader;
-        System.out.println("Reading CSV in " + csvReaderFull + "ms");
-        dbScan.setEps(1.2);
-        dbScan.setMinPts(10);
+        System.out.println("Reading CSV in: " + csvReaderFull + "ms");
+        dbScan.setEps(Double.parseDouble(args[1]));
+        dbScan.setMinPts(Double.parseDouble(args[2]));
         long clusterFinder = System.currentTimeMillis();
         dbScan.findClusters();
         long clusterFinder2 = System.currentTimeMillis();
         long clusterFinderFull = clusterFinder2-clusterFinder;
-        System.out.println("Finding clusters in " + clusterFinderFull +"ms");
+        System.out.println("Finding clusters in: " + clusterFinderFull +"ms");
         String filepath = "data_clusters_"+ dbScan.eps+"_"+dbScan.minPts+"_"+dbScan.getNumberOfClusters()+".csv";
         long fileSaver = System.currentTimeMillis();
         dbScan.save(filepath);
         long fileSaver2 = System.currentTimeMillis();
         long fileSaverTotal = fileSaver2-fileSaver;
-        System.out.println("Saving file in " + fileSaverTotal+"ms");
-        System.out.println("Total number of clusters found: " + dbScan.getNumberOfClusters());
-        System.out.println("Total number of noises found: " + dbScan.totalNoises);
+        System.out.println("Saving file in: " + fileSaverTotal+"ms");
+        dbScan.clustersSize();
 
 
     }
