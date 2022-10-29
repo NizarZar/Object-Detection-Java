@@ -1,5 +1,14 @@
+// Student name: NIZAR ZARIOUH
+// Student number: 300263208
+
+
 import java.util.EmptyStackException;
 import java.util.Vector;
+
+/*
+stack implementation
+!! THIS IS NOT MY IMPLEMENTATION BUT THE JAVA GIVEN ONE! !!
+ */
 
 public class Stack<E> extends Vector<E> {
     /**
