@@ -43,17 +43,17 @@ public class DBScan {
         Stack<Point3D> stack = new Stack<>();
         Random random = new Random();
         totalNoises = 0;
-        hashMapR.put(-1, random.nextDouble());
-        hashMapG.put(-1, random.nextDouble());
-        hashMapB.put(-1, random.nextDouble());
+        hashMapR.put(0, 0.0);
+        hashMapG.put(0, 0.0);
+        hashMapB.put(0, 0.0);
         for(Point3D point : points){
             NearestNeighbors neighbors = new NearestNeighbors(points);
-            final int UNDEFINED = 0;
+            final int UNDEFINED = -1;
             if(point.getLabel() != UNDEFINED){
                 continue;
             }
             List<Point3D> nearest = neighbors.rangeQuery(eps,point);
-            final int NOISE = -1;
+            final int NOISE = 0;
             if(nearest.size() < minPts){
                 point.setLabel(NOISE);
                 totalNoises++;
@@ -173,23 +173,25 @@ public class DBScan {
 
 
 
+
     public static void main(String[] args) throws IOException {
-        long totalRun1 = System.currentTimeMillis(); // start of the program in Millis to count how much it takes for the program to executes
-        long csvReader = System.currentTimeMillis(); // to calculate how much it takes to read the csv file
+        long totalRun1 = System.currentTimeMillis();
+        long csvReader = System.currentTimeMillis();
         List<Point3D> db = read(args[0]); // the list of 3d points will be taken from reading the csv file, which will be the first argument when executing the program
         DBScan dbScan = new DBScan(db); // creating a dbscan using the db points read
         long csvReader2 = System.currentTimeMillis();
         long csvReaderFull = csvReader2-csvReader; // time it took to execute the read csv file algorithm
-        System.out.println("Reading CSV in: " + csvReaderFull + "ms"); // printing the time that it took to execute the read csv file algorithm
+        System.out.println("Reading CSV in: " + csvReaderFull + "ms");
         dbScan.setEps(Double.parseDouble(args[1])); // the eps number will be the second argument given to the program to execute properly
         dbScan.setMinPts(Double.parseDouble(args[2])); // minPts number will be the third argument given to the program to execute properly
-        long clusterFinder = System.currentTimeMillis(); //find how much time it takes to run the findClusters algorithm
+        long clusterFinder = System.currentTimeMillis();
         dbScan.findClusters(); // finding the clusters
         long clusterFinder2 = System.currentTimeMillis();
         long clusterFinderFull = clusterFinder2-clusterFinder; // find how much time it takes to run the findClusters algorithm
-        System.out.println("Finding clusters in: " + clusterFinderFull +"ms"); // printing how much time it took to run the findClusters algorithm
-        String filepath = "data_clusters_"+ dbScan.eps+"_"+dbScan.minPts+"_"+dbScan.getNumberOfClusters()+".csv"; // the save file format
-        long fileSaver = System.currentTimeMillis(); // find how much time it takes to run the save file method
+        System.out.println("Finding clusters in: " + clusterFinderFull +"ms");
+        String file = args[0].replace(".csv","");
+        String filepath = file+"_clusters_"+ dbScan.eps+"_"+dbScan.minPts+"_"+dbScan.getNumberOfClusters()+".csv"; // the save file format
+        long fileSaver = System.currentTimeMillis();
         dbScan.save(filepath); // saving the results in a csv file
         long fileSaver2 = System.currentTimeMillis();
         long fileSaverTotal = fileSaver2-fileSaver;
@@ -197,9 +199,12 @@ public class DBScan {
         dbScan.clustersSize(); // calling clustersSize method to get information about the clusters, noises and the sizes.
         long totalRun = System.currentTimeMillis() - totalRun1;
         System.out.println("The program took " + totalRun + "ms to run."); //total amount of time it took to run the program
+        
 
 
     }
+
+
 }
 
 

@@ -9,7 +9,7 @@ public class Point3D {
     private int label;
     // Point3D constructor
     public Point3D(double x, double y, double z){
-        setLabel(0);
+        setLabel(-1);
         this.x = x;
         this.y = y;
         this.z = z;
