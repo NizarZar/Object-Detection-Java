@@ -159,6 +159,7 @@ public class DBScan {
     public void clustersSize(){
         HashMap<Integer, Integer> hashMapClustersSize = new HashMap<>();
         LinkedHashMap<Integer, Integer> linkedHashMap = new LinkedHashMap<>();
+
         for(Point3D point : points){
            hashMapClustersSize.merge(point.getLabel(),1,Integer::sum);
        }
