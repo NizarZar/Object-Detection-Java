@@ -37,6 +37,15 @@ public class Point3D {
     public void setLabel(int label) {
         this.label = label;
     }
+    public double get (int axis){
+        if(axis == 0){
+            return x;
+        } else if (axis == 1){
+            return y;
+        } else {
+            return z;
+        }
+    }
 
 
     // calculate the distance between two points in 3D
@@ -46,7 +55,7 @@ public class Point3D {
 
    @Override
    public String toString(){
-        return (this.x + "" + this.y + "" + this.z + "");
+        return (this.x + " " + this.y + " " + this.z + " ");
    }
 
 }
