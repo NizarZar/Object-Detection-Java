@@ -31,13 +31,11 @@ public class DBScan {
     public void setMinPts(double minPts) {
         this.minPts = minPts;
     }
-
-
     /*
     cluster counter algorithm
     + Added hashmap data structure to store cluster counter and a random rgb value==
     storing number of total noises generated
-     */
+    */
     public void findClusters(){
         c = 0;
         Stack<Point3D> stack = new Stack<>();
@@ -46,8 +44,8 @@ public class DBScan {
         hashMapR.put(0, 0.0);
         hashMapG.put(0, 0.0);
         hashMapB.put(0, 0.0);
+        NearestNeighborsKD neighbors = new NearestNeighborsKD(points);
         for(Point3D point : points){
-            NearestNeighbors neighbors = new NearestNeighbors(points);
             final int UNDEFINED = -1;
             if(point.getLabel() != UNDEFINED){
                 continue;
@@ -149,13 +147,23 @@ public class DBScan {
 
     // Returns the list of 3D Points
     public List<Point3D> getPoints() {
+        
         return points;
+
+    }
+
+    public double getEps(){
+        return eps;
+    }
+
+    public double getMinPts() {
+        return minPts;
     }
 
     /*
-    This method will print the total number of clusters, total number of noises and the sizes of each cluster from largest to smallest
-    We used a hashmap to store the points and then a LinkedHashMap to sort the hashmap in descending order (values not keys)
-     */
+        This method will print the total number of clusters, total number of noises and the sizes of each cluster from largest to smallest
+        We used a hashmap to store the points and then a LinkedHashMap to sort the hashmap in descending order (values not keys)
+         */
     public void clustersSize(){
         HashMap<Integer, Integer> hashMapClustersSize = new HashMap<>();
         LinkedHashMap<Integer, Integer> linkedHashMap = new LinkedHashMap<>();
@@ -173,37 +181,6 @@ public class DBScan {
     }
 
 
-
-
-    public static void main(String[] args) throws IOException {
-        long totalRun1 = System.currentTimeMillis();
-        long csvReader = System.currentTimeMillis();
-        List<Point3D> db = read(args[0]); // the list of 3d points will be taken from reading the csv file, which will be the first argument when executing the program
-        DBScan dbScan = new DBScan(db); // creating a dbscan using the db points read
-        long csvReader2 = System.currentTimeMillis();
-        long csvReaderFull = csvReader2-csvReader; // time it took to execute the read csv file algorithm
-        System.out.println("Reading CSV in: " + csvReaderFull + "ms");
-        dbScan.setEps(Double.parseDouble(args[1])); // the eps number will be the second argument given to the program to execute properly
-        dbScan.setMinPts(Double.parseDouble(args[2])); // minPts number will be the third argument given to the program to execute properly
-        long clusterFinder = System.currentTimeMillis();
-        dbScan.findClusters(); // finding the clusters
-        long clusterFinder2 = System.currentTimeMillis();
-        long clusterFinderFull = clusterFinder2-clusterFinder; // find how much time it takes to run the findClusters algorithm
-        System.out.println("Finding clusters in: " + clusterFinderFull +"ms");
-        String file = args[0].replace(".csv","");
-        String filepath = file+"_clusters_"+ dbScan.eps+"_"+dbScan.minPts+"_"+dbScan.getNumberOfClusters()+".csv"; // the save file format
-        long fileSaver = System.currentTimeMillis();
-        dbScan.save(filepath); // saving the results in a csv file
-        long fileSaver2 = System.currentTimeMillis();
-        long fileSaverTotal = fileSaver2-fileSaver;
-        System.out.println("Saving file in: " + fileSaverTotal+"ms"); // how much it took to save the file
-        dbScan.clustersSize(); // calling clustersSize method to get information about the clusters, noises and the sizes.
-        long totalRun = System.currentTimeMillis() - totalRun1;
-        System.out.println("The program took " + totalRun + "ms to run."); //total amount of time it took to run the program
-        
-
-
-    }
 
 
 }

@@ -4,12 +4,12 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class NearestNeighbors {
+public class NearestNeighbors{
 
-    private List<Point3D> point3DList;
     // constructor
+    List<Point3D> point3DList;
     public NearestNeighbors(List<Point3D> point3DList){
-            this.point3DList = point3DList;
+        this.point3DList = point3DList;
     }
 
     // range query algorithm
