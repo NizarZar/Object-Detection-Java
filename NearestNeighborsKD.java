@@ -30,7 +30,6 @@ public class NearestNeighborsKD {
         if(p.get(node.axis) + eps > node.value){
             rangeQuery(p,eps,neighbors,node.right);
         }
-        return;
 
     }
 

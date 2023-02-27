@@ -7,6 +7,7 @@
  * Robert Laganiere, 2022
  *
  */
+import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -35,14 +36,6 @@ public class Exp2 {
             y= Double.parseDouble(sc.next());
             z= Double.parseDouble(sc.next());
             points.add(new Point3D(x,y,z));
-            sc.nextLine();
-            sc.nextLine();
-            sc.nextLine();
-            sc.nextLine();
-            sc.nextLine();
-            sc.nextLine();
-            sc.nextLine();
-            sc.nextLine();
         }
 
         sc.close();  //closes the scanner
@@ -51,31 +44,30 @@ public class Exp2 {
     }
 
     public static void main(String[] args) throws Exception {
-        long y = System.currentTimeMillis();
         String type = args[0];
-        // not reading args[0]
         double eps= Double.parseDouble(args[1]);
-        NearestNeighbors nn;
         int steps = Integer.parseInt(args[3]);
         // reads the csv file
-        List<Point3D> points= Exp1.read(args[2]);
+        //exp1 read similiar
+        List<Point3D> points= read(args[2]);
         
 
         // creates the NearestNeighbor instance
         NearestNeighbors nearestNeighborsLinear = new NearestNeighbors(points);
         NearestNeighborsKD nearestNeighborsKD = new NearestNeighborsKD(points);
         long totalTime = 0;
-        List<Point3D> neighbors;
         for(int i = 0;i<points.size();i+=steps){
             Point3D currentPoint = points.get(i);
             if(type.equalsIgnoreCase("lin")){
                 long startTime = System.nanoTime();
                 nearestNeighborsLinear.rangeQuery(eps,currentPoint);
                 totalTime+=System.nanoTime()-startTime;
-            } else {
+            } else if (type.equalsIgnoreCase("kd")){
                 long startTime = System.nanoTime();
                 nearestNeighborsKD.rangeQuery(eps, currentPoint);
                 totalTime += System.nanoTime() - startTime;
+            } else {
+                throw new Exception("Invalid parameter type!");
             }
 
         }
