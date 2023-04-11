@@ -5,4 +5,5 @@ Object Detection Program using DBScan Algorithm
 
 
 
-Programmed in both Java and C#
+/ This program takes a CSV file of points to find detectable objects.
+/ The detectable objects points are parsed in a CSV file which can then be read in a python file that uses opengl for 3d representation
